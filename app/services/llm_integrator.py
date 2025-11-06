@@ -45,8 +45,31 @@ async def generate_signal(ta_results: dict, symbol: str) -> str:
                     result = await resp.json()
                     return result['choices'][0]['message']['content'].strip()
                 else:
-                    error_text = await resp.text()
-                    return f"Ошибка API DeepSeek (статус {resp.status}): {error_text}"
+                    # Пытаемся получить JSON с ошибкой
+                    try:
+                        error_json = await resp.json()
+                        error_msg = error_json.get('error', {}).get('message', str(error_json))
+                        error_code = error_json.get('error', {}).get('code', 'unknown')
+                        
+                        # Специальная обработка ошибки недостатка средств
+                        if resp.status == 402 or 'Insufficient Balance' in error_msg:
+                            return (
+                                "⚠️ Ошибка: Недостаточно средств на аккаунте DeepSeek.\n\n"
+                                "Пожалуйста, пополните баланс на https://platform.deepseek.com/\n"
+                                "После пополнения баланса бот снова сможет генерировать сигналы."
+                            )
+                        
+                        return f"Ошибка API DeepSeek (статус {resp.status}, код: {error_code}): {error_msg}"
+                    except:
+                        # Если не удалось распарсить JSON, получаем текст
+                        error_text = await resp.text()
+                        if resp.status == 402 or 'Insufficient Balance' in error_text:
+                            return (
+                                "⚠️ Ошибка: Недостаточно средств на аккаунте DeepSeek.\n\n"
+                                "Пожалуйста, пополните баланс на https://platform.deepseek.com/\n"
+                                "После пополнения баланса бот снова сможет генерировать сигналы."
+                            )
+                        return f"Ошибка API DeepSeek (статус {resp.status}): {error_text}"
     except aiohttp.ClientError as e:
         return f"Ошибка сети при обращении к DeepSeek: {e}"
     except Exception as e:

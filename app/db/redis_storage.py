@@ -1,8 +1,15 @@
 import redis.asyncio as redis
 from typing import Set
+from app.config import REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_PASSWORD
 
 # Используем одну Redis-инстанцию для всего приложения
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis(
+    host=REDIS_HOST,
+    port=REDIS_PORT,
+    db=REDIS_DB,
+    password=REDIS_PASSWORD,
+    decode_responses=True
+)
 
 async def add_subscriber(symbol: str, timeframe: str, chat_id: int):
     """

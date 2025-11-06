@@ -1,0 +1,43 @@
+# Виртуальное окружение (не нужно в Docker)
+venv/
+env/
+ENV/
+
+# Python кэш
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Environment variables (будут переданы через docker-compose)
+.env
+.env.local
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Документация
+README.md
+*.md
+
+# Логи
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
